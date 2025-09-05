@@ -5,11 +5,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Filter, ChevronUp, ChevronDown } from "lucide-react";
 import { useState, useMemo } from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
-
-const sentimentData = [
-  { name: "เชิงบวก", value: 72.3, count: 892, color: "#20A161" },
-  { name: "เชิงลบ", value: 27.7, count: 342, color: "#D14343" },
-];
+import { useSupabaseData } from "@/hooks/useSupabaseData";
+import { Skeleton } from "@/components/ui/skeleton";
 
 // Main topics to sub-topics mapping
 const mainTopicsMapping: Record<string, string[]> = {
@@ -63,36 +60,8 @@ const mainTopicsMapping: Record<string, string[]> = {
   "ความประทับใจอื่นๆ": ["ความประทับใจอื่นๆ"],
 };
 
-// Extended topics data with main category mapping
-const topicsData = [
-  { main: "สภาพแวดล้อมและสิ่งอำนวยความสะดวก", sub: "แสง", negative_count: 158, positive_count: 349 },
-  { main: "พนักงานและบุคลากร", sub: "ความเอาใจใส่ในการให้บริการลูกค้า", negative_count: 48, positive_count: 288 },
-  { main: "พนักงานและบุคลากร", sub: "ความสามารถในการตอบคำถามหรือให้คำแนะนำ", negative_count: 37, positive_count: 294 },
-  { main: "เงื่อนไขและผลิตภัณฑ์", sub: "ความเรียบง่ายข้อมูล", negative_count: 40, positive_count: 279 },
-  { main: "ระบบและกระบวนการให้บริการ", sub: "ความพร้อมในการให้บริการ", negative_count: 30, positive_count: 278 },
-  { main: "สภาพแวดล้อมและสิ่งอำนวยความสะดวก", sub: "ที่จอดรถ", negative_count: 119, positive_count: 264 },
-  { main: "เทคโนโลยีและดิจิทัล", sub: "เครื่องออกบัตรคิว", negative_count: 142, positive_count: 245 },
-  { main: "พนักงานและบุคลากร", sub: "ความประทับใจในการให้บริการ", negative_count: 151, positive_count: 241 },
-  { main: "Market Conduct", sub: "ไม่เอาเปรียบ", negative_count: 47, positive_count: 229 },
-  { main: "เงื่อนไขและผลิตภัณฑ์", sub: "ระยะเวลาอนุมัติ", negative_count: 152, positive_count: 78 },
-  { main: "สภาพแวดล้อมและสิ่งอำนวยความสะดวก", sub: "พื้นที่และความคับคั่ง", negative_count: 39, positive_count: 155 },
-  { main: "เทคโนโลยีและดิจิทัล", sub: "E-KYC Scanner", negative_count: 114, positive_count: 188 },
-  { main: "Market Conduct", sub: "ไม่บังคับ", negative_count: 35, positive_count: 152 },
-  { main: "Market Conduct", sub: "ไม่รบกวน", negative_count: 30, positive_count: 112 },
-  { main: "เทคโนโลยีและดิจิทัล", sub: "เครื่องปรับสมุด", negative_count: 124, positive_count: 135 },
-  { main: "พนักงานและบุคลากร", sub: "ความถูกต้องในการให้บริการ", negative_count: 28, positive_count: 127 },
-  { main: "เงื่อนไขและผลิตภัณฑ์", sub: "รายละเอียด ผลิตภัณฑ์", negative_count: 146, positive_count: 120 },
-  { main: "เทคโนโลยีและดิจิทัล", sub: "ระบบ Core ของธนาคาร", negative_count: 47, positive_count: 118 },
-  { main: "เทคโนโลยีและดิจิทัล", sub: "ATM ADM CDM", negative_count: 66, positive_count: 48 },
-  { main: "สภาพแวดล้อมและสิ่งอำนวยความสะดวก", sub: "จุดรอรับบริการ", negative_count: 125, positive_count: 62 },
-  { main: "พนักงานและบุคลากร", sub: "ความสุภาพและมารยาทของพนักงาน", negative_count: 85, positive_count: 195 },
-  { main: "พนักงานและบุคลากร", sub: "ความรวดเร็วในการให้บริการ", negative_count: 92, positive_count: 178 },
-  { main: "สภาพแวดล้อมและสิ่งอำนวยความสะดวก", sub: "ความสะอาด", negative_count: 45, positive_count: 210 },
-  { main: "ระบบและกระบวนการให้บริการ", sub: "ระบบเรียกคิวและจัดการคิว", negative_count: 98, positive_count: 134 },
-  { main: "เทคโนโลยีและดิจิทัล", sub: "แอพพลิเคชั่น MyMo", negative_count: 73, positive_count: 89 },
-];
-
 export const FeedbackBlock = () => {
+  const { loading, error, sentimentData, topicData } = useSupabaseData();
   const [selectedFilter, setSelectedFilter] = useState<"none" | "positive" | "negative">("positive");
 
   // Main topics filter state - all selected by default
@@ -104,9 +73,9 @@ export const FeedbackBlock = () => {
 
   // Filtered topics data based on selected main topics
   const filteredTopicsData = useMemo(() => {
-    if (selectedMainTopics.length === 0) return topicsData;
-    return topicsData.filter((item) => selectedMainTopics.includes(item.main));
-  }, [selectedMainTopics]);
+    if (selectedMainTopics.length === 0) return topicData;
+    return topicData.filter((item) => selectedMainTopics.includes(item.main));
+  }, [selectedMainTopics, topicData]);
 
   // Determine if we should show all sub-topics (single main topic) or top 10 (multiple)
   const shouldShowAllSubTopics = selectedMainTopics.length === 1;
@@ -195,4 +164,176 @@ export const FeedbackBlock = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <Card className="rounded-2xl border shadow-card bg-white relative overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 h-2 bg-tertiary" />
+          <CardHeader>
+            <Skeleton className="h-6 w-48" />
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Skeleton className="h-64" />
+              <Skeleton className="h-64" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className="rounded-2xl border shadow-card bg-white relative overflow-hidden">
+        <div className="absolute top-0 left-0 right-0 h-2 bg-red-500" />
+        <CardHeader>
+          <CardTitle className="font-kanit text-xl font-bold text-red-600">
+            เกิดข้อผิดพลาด: {error}
+          </CardTitle>
+        </CardHeader>
+      </Card>
+    );
+  }
+
+  // Generate sentiment data from Supabase data
+  const sentimentChartData = sentimentData ? [
+    { 
+      name: "เชิงบวก", 
+      value: sentimentData.positive, 
+      count: sentimentData.positiveCount, 
+      color: "#20A161" 
+    },
+    { 
+      name: "เชิงลบ", 
+      value: sentimentData.negative, 
+      count: sentimentData.negativeCount, 
+      color: "#D14343" 
+    },
+  ] : [];
+
+  return (
+    <div className="space-y-6">
+      {/* Header Card */}
+      <Card className="rounded-2xl border shadow-card bg-white relative overflow-hidden">
+        <div className="absolute top-0 left-0 right-0 h-2 bg-tertiary" />
+        <CardHeader>
+          <CardTitle className="font-kanit text-xl font-bold text-foreground">
+            การวิเคราะห์ความเห็น
+          </CardTitle>
+        </CardHeader>
+      </Card>
+
+      {/* Main Content */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Left: Sentiment Pie Chart */}
+        <Card className="rounded-2xl border shadow-card bg-white">
+          <CardHeader>
+            <CardTitle className="font-kanit text-lg font-semibold text-center">
+              สัดส่วนความเห็น
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={sentimentChartData}
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={80}
+                    paddingAngle={5}
+                    dataKey="value"
+                    label={({ name, value }) => `${name}: ${value}%`}
+                    labelLine={false}
+                  >
+                    {sentimentChartData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip 
+                    formatter={(value: any, name: string) => [
+                      `${value}% (${sentimentChartData.find(d => d.name === name)?.count || 0} ความเห็น)`,
+                      name
+                    ]}
+                    contentStyle={{
+                      backgroundColor: 'white',
+                      border: '1px solid hsl(var(--border))',
+                      borderRadius: '8px',
+                      fontFamily: 'Kanit'
+                    }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Right: Topic Filters and Data */}
+        <Card className="rounded-2xl border shadow-card bg-white">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="font-kanit text-lg font-semibold">
+                หัวข้อความเห็น
+              </CardTitle>
+              
+              {/* Topic Filter Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm" className="gap-2">
+                    <Filter className="h-4 w-4" />
+                    <span className="font-kanit">กรอง ({selectedMainTopics.length})</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-80 p-4" align="end">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-kanit font-medium">เลือกหัวข้อหลัก</h4>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleSelectAll}
+                        className="h-auto p-1 font-kanit text-xs"
+                      >
+                        {selectedMainTopics.length === Object.keys(mainTopicsMapping).length
+                          ? "ไม่เลือกทั้งหมด"
+                          : "เลือกทั้งหมด"}
+                      </Button>
+                    </div>
+                    <div className="space-y-2 max-h-60 overflow-y-auto">
+                      {Object.keys(mainTopicsMapping).map((topic) => (
+                        <div key={topic} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={topic}
+                            checked={selectedMainTopics.includes(topic)}
+                            onCheckedChange={() => handleMainTopicToggle(topic)}
+                          />
+                          <label
+                            htmlFor={topic}
+                            className="text-sm font-kanit cursor-pointer flex-1"
+                          >
+                            {topic}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-center text-muted-foreground font-kanit">
+              แสดงข้อมูล {filteredTopicsData.length} หัวข้อ
+              {filteredTopicsData.length === 0 && (
+                <div className="mt-4 p-4 bg-muted rounded-lg">
+                  ไม่มีข้อมูลสำหรับหัวข้อที่เลือก
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
 };

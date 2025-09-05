@@ -4,6 +4,8 @@ import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { HelpCircle, X } from "lucide-react";
+import { useSupabaseData } from "@/hooks/useSupabaseData";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const ServiceTypeInfoDialog: React.FC = () => {
   const items = [
@@ -78,73 +80,7 @@ interface KPIData {
   };
 }
 
-const kpiData: KPIData[] = [
-  {
-    icon: FileText,
-    title: "แบบฟอร์มทั้งหมด",
-    value: 1247,
-    change: 12.5,
-    previousValue: 1109,
-    colorScheme: {
-      bg: "hsl(var(--kpi-blue-bg))",
-      border: "hsl(var(--kpi-blue-border))",
-      text: "hsl(var(--kpi-blue-text))",
-      icon: "hsl(var(--kpi-blue-text))"
-    }
-  },
-  {
-    icon: Phone,
-    title: "ให้ข้อมูลติดต่อ",
-    value: 892,
-    change: -5.3,
-    previousValue: 941,
-    colorScheme: {
-      bg: "hsl(var(--kpi-green-bg))",
-      border: "hsl(var(--kpi-green-border))",
-      text: "hsl(var(--kpi-green-text))",
-      icon: "hsl(var(--kpi-green-text))"
-    }
-  },
-  {
-    icon: Lightbulb,
-    title: "มีข้อเสนอแนะ",
-    value: 456,
-    change: 18.7,
-    previousValue: 384,
-    colorScheme: {
-      bg: "hsl(var(--kpi-yellow-bg))",
-      border: "hsl(var(--kpi-yellow-border))",
-      text: "hsl(var(--kpi-yellow-text))",
-      icon: "hsl(var(--kpi-yellow-text))"
-    }
-  },
-  {
-    icon: AlertTriangle,
-    title: "ข้อร้องเรียนรุนแรง",
-    value: 23,
-    change: -34.2,
-    previousValue: 35,
-    colorScheme: {
-      bg: "hsl(var(--kpi-red-bg))",
-      border: "hsl(var(--kpi-red-border))",
-      text: "hsl(var(--kpi-red-text))",
-      icon: "hsl(var(--kpi-red-text))"
-    }
-  }
-];
-
-const branchTypeData = [
-  { name: "ให้บริการ 5 วัน", value: 68, color: "#DF7AB0" },
-  { name: "ให้บริการ 7 วัน", value: 32, color: "#A8D5F3" }
-];
-
-const serviceTypeData = [
-  { category: "ฝาก/ถอน", current: 450, previous: 420 },
-  { category: "ชำระเงิน", current: 320, previous: 310 },
-  { category: "สมัครบริการ", current: 180, previous: 165 },
-  { category: "สอบถาม", current: 210, previous: 195 },
-  { category: "อื่นๆ", current: 87, previous: 98 }
-];
+// Removed mock data - now using real Supabase data
 
 const KPICard = ({ data }: { data: KPIData }) => {
   const Icon = data.icon;
@@ -219,7 +155,107 @@ const KPICard = ({ data }: { data: KPIData }) => {
 };
 
 export const FormSubmissionBlock = () => {
+  const { loading, error, dashboardStats, branchTypeData, serviceTypeData } = useSupabaseData();
   const renderPieLabel = ({ value }: any) => `${value}%`;
+
+  if (loading) {
+    return (
+      <Card className="rounded-2xl border shadow-card bg-white overflow-hidden">
+        <div className="h-2 rounded-t-2xl" style={{ background: 'var(--gradient-pink-strip)' }} />
+        <CardHeader className="pb-4 pt-5">
+          <Skeleton className="h-6 w-48" />
+        </CardHeader>
+        <CardContent className="space-y-6 p-6 pt-0">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {[1, 2, 3, 4].map(i => (
+              <Skeleton key={i} className="h-32 rounded-2xl" />
+            ))}
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Skeleton className="h-80" />
+            <Skeleton className="h-80" />
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className="rounded-2xl border shadow-card bg-white overflow-hidden">
+        <div className="h-2 rounded-t-2xl bg-red-500" />
+        <CardHeader className="pb-4 pt-5">
+          <CardTitle className="font-kanit text-xl font-bold text-red-600">
+            เกิดข้อผิดพลาด: {error}
+          </CardTitle>
+        </CardHeader>
+      </Card>
+    );
+  }
+
+  // Generate KPI data from Supabase data
+  const kpiData: KPIData[] = dashboardStats ? [
+    {
+      icon: FileText,
+      title: "แบบฟอร์มทั้งหมด",
+      value: dashboardStats.totalForms,
+      change: dashboardStats.prevTotalForms > 0 
+        ? ((dashboardStats.totalForms - dashboardStats.prevTotalForms) / dashboardStats.prevTotalForms * 100)
+        : 0,
+      previousValue: dashboardStats.prevTotalForms,
+      colorScheme: {
+        bg: "hsl(var(--kpi-blue-bg))",
+        border: "hsl(var(--kpi-blue-border))",
+        text: "hsl(var(--kpi-blue-text))",
+        icon: "hsl(var(--kpi-blue-text))"
+      }
+    },
+    {
+      icon: Phone,
+      title: "ให้ข้อมูลติดต่อ",
+      value: dashboardStats.contactProvided,
+      change: dashboardStats.prevContactProvided > 0 
+        ? ((dashboardStats.contactProvided - dashboardStats.prevContactProvided) / dashboardStats.prevContactProvided * 100)
+        : 0,
+      previousValue: dashboardStats.prevContactProvided,
+      colorScheme: {
+        bg: "hsl(var(--kpi-green-bg))",
+        border: "hsl(var(--kpi-green-border))",
+        text: "hsl(var(--kpi-green-text))",
+        icon: "hsl(var(--kpi-green-text))"
+      }
+    },
+    {
+      icon: Lightbulb,
+      title: "มีข้อเสนอแนะ",
+      value: dashboardStats.hasSuggestions,
+      change: dashboardStats.prevHasSuggestions > 0 
+        ? ((dashboardStats.hasSuggestions - dashboardStats.prevHasSuggestions) / dashboardStats.prevHasSuggestions * 100)
+        : 0,
+      previousValue: dashboardStats.prevHasSuggestions,
+      colorScheme: {
+        bg: "hsl(var(--kpi-yellow-bg))",
+        border: "hsl(var(--kpi-yellow-border))",
+        text: "hsl(var(--kpi-yellow-text))",
+        icon: "hsl(var(--kpi-yellow-text))"
+      }
+    },
+    {
+      icon: AlertTriangle,
+      title: "ข้อร้องเรียนรุนแรง",
+      value: dashboardStats.severeComplaints,
+      change: dashboardStats.prevSevereComplaints > 0 
+        ? ((dashboardStats.severeComplaints - dashboardStats.prevSevereComplaints) / dashboardStats.prevSevereComplaints * 100)
+        : 0,
+      previousValue: dashboardStats.prevSevereComplaints,
+      colorScheme: {
+        bg: "hsl(var(--kpi-red-bg))",
+        border: "hsl(var(--kpi-red-border))",
+        text: "hsl(var(--kpi-red-text))",
+        icon: "hsl(var(--kpi-red-text))"
+      }
+    }
+  ] : [];
   
   return (
     <Card className="rounded-2xl border shadow-card bg-white overflow-hidden">
