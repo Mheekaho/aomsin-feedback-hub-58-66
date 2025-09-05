@@ -1,0 +1,293 @@
+@import url('https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    /* Layout Variables */
+    --topbar-h: 96px;
+    --rail-w: 68px;
+    --rail-gap: 24px;
+    --page-max-w: 1200px;   /* ปรับได้ตามดีไซน์ (เช่น 1120/1280) */
+    --footer-h: 0px;        /* ถ้ามี footer แบบ fixed ตั้งค่าสูงจริง เช่น 64px */
+    
+    --background: 0 0% 100%;
+    --foreground: 0 0% 15%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 15%;
+
+    /* Aomsin Pink Theme Color System */
+    --primary: 330 68% 49%; /* #D8218C - ชมพูเข้ม */
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 330 60% 55%; /* hover state */
+
+    --secondary: 330 48% 65%; /* #CE5997 - ชมพูปานกลาง */
+    --secondary-foreground: 0 0% 100%;
+
+    --tertiary: 330 35% 75%; /* #DF7AB0 - ชมพูอ่อน */
+    --tertiary-foreground: 0 0% 15%;
+
+    --gray-base: 0 0% 83%; /* #D3D3D3 - เทา */
+    --gray-foreground: 0 0% 15%;
+
+    /* Rail Sidebar Colors - Updated to match specifications */
+    --rail-background: 0 0% 100%; /* #FFFFFF */
+    --rail-border: 220 13% 91%; /* #E5E7EB */
+    --rail-icon: 220 9% 42%; /* #6B7280 - เทาเข้ม default */
+    --rail-hover-bg: 330 100% 97%; /* #FFF1F7 */
+    --rail-hover-border: 330 49% 85%; /* #F7B4D1 */
+    --rail-hover-icon: 330 42% 59%; /* #CE5997 */
+    --rail-active-bg: 330 100% 91%; /* Gradient start #FFD6EB */
+    --rail-active-bg-end: 330 100% 95%; /* Gradient end #FFEAF4 */
+    --rail-active-border: 330 49% 80%; /* #F5A3C5 */
+    --rail-active-icon: 330 68% 49%; /* #D8218C */
+    --rail-shadow: 330 68% 49%; /* #D8218C with opacity */
+    --rail-focus: 330 35% 75%; /* #DF7AB0 for focus ring */
+    
+    /* Menu button colors */
+    --menu-bg: 220 14% 98%; /* #F9FAFB */
+    --menu-border: 220 13% 91%; /* #E5E7EB */
+
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
+
+    --accent: 330 35% 75%;
+    --accent-foreground: 0 0% 15%;
+
+    --destructive: 0 84% 53%; /* #D14343 - แดงลบ */
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 220 13% 91%; /* #E5E7EB */
+    --input: 0 0% 96%;
+    --ring: 330 68% 49%;
+
+    --radius: 1rem; /* 16px rounded corners */
+
+    /* Chart colors - Updated with specified colors */
+    --chart-positive: 142 76% 38%; /* #20A161 - เขียวบวก */
+    --chart-negative: 0 84% 53%; /* #D14343 - แดงลบ */
+    --chart-gray: 231 7% 65%; /* #9CA3AF - เทาฐาน */
+    --chart-pink-1: 330 35% 75%; /* #DF7AB0 - ชมพูอ่อน */
+    --chart-pink-2: 330 48% 65%; /* #CE5997 - ชมพูปานกลาง */
+    --chart-pink-3: 330 68% 49%; /* #D8218C - ชมพูเข้ม */
+    
+    /* KPI Card specific colors */
+    --kpi-blue-bg: 213 100% 97%; /* #E3EFFE */
+    --kpi-blue-border: 213 100% 87%; /* #BFD6FF */
+    --kpi-blue-text: 213 91% 20%; /* #1E3A8A */
+    
+    --kpi-green-bg: 142 76% 95%; /* #E6FCED */
+    --kpi-green-border: 142 70% 83%; /* #B8F0D2 */
+    --kpi-green-text: 142 91% 20%; /* #065F46 */
+    
+    --kpi-yellow-bg: 48 100% 94%; /* #FEF9CD */
+    --kpi-yellow-border: 48 90% 75%; /* #FCEB9A */
+    --kpi-yellow-text: 48 89% 30%; /* #A16207 */
+    
+    --kpi-red-bg: 0 84% 93%; /* #FEE9E9 */
+    --kpi-red-border: 0 84% 85%; /* #FDCACA */
+    --kpi-red-text: 0 84% 37%; /* #B91C1C */
+
+    /* Custom Gradients */
+    --gradient-topbar: linear-gradient(to right, #f2449e 0%, #fd84d6 50%, #fda0dd 100%);
+    --gradient-pink-strip: linear-gradient(to right, #DF7AB0, #F9B5D3);
+    --gradient-pink-light: linear-gradient(135deg, hsl(var(--tertiary)), hsl(var(--secondary)));
+    
+    /* Custom Shadows */
+    --shadow-card: 0 8px 20px rgba(0, 0, 0, 0.06);
+    --shadow-soft: 0 4px 16px rgba(0, 0, 0, 0.04);
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+html, body, #root { min-height: 100dvh; }
+
+  .dark {
+    --background: 0 0% 9%;
+    --foreground: 0 0% 95%;
+
+    --card: 0 0% 9%;
+    --card-foreground: 0 0% 95%;
+
+    --popover: 0 0% 9%;
+    --popover-foreground: 0 0% 95%;
+
+    --primary: 330 68% 49%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 330 48% 65%;
+    --secondary-foreground: 0 0% 100%;
+
+    --tertiary: 330 35% 75%;
+    --tertiary-foreground: 0 0% 15%;
+
+    --gray: 0 0% 20%;
+    --gray-foreground: 0 0% 85%;
+
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 65%;
+
+    --accent: 330 35% 25%;
+    --accent-foreground: 0 0% 95%;
+
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 0 0% 20%;
+    --input: 0 0% 15%;
+    --ring: 330 68% 49%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-kanit;
+  }
+}
+
+@layer utilities {
+  .gradient-pink {
+    background: var(--gradient-pink);
+  }
+  
+  .gradient-primary {
+    background: var(--gradient-primary);
+  }
+  
+  .shadow-soft {
+    box-shadow: var(--shadow-soft);
+  }
+  
+  .shadow-card {
+    box-shadow: var(--shadow-card);
+  }
+
+  /* Mobile Navigation Scrollbar */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* Mobile responsive utilities */
+  .table-responsive {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Prevent horizontal scroll on body */
+  html, body {
+    overflow-x: hidden;
+  }
+
+  /* Mobile table wrapper */
+  .mobile-table-wrap {
+    @apply -mx-4 sm:mx-0 overflow-x-auto px-4 sm:px-0;
+  }
+
+  /* Mini Rail Sidebar Styles */
+  .mini-rail {
+    position: fixed;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 30;
+    width: var(--rail-w);
+    background: #fff;
+    border: 1px solid #E5E7EB;
+    border-radius: 20px;
+    box-shadow: 0 10px 24px rgba(216, 33, 140, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
+    padding: 10px;
+  }
+
+  .mini-rail button {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    display: grid;
+    place-items: center;
+    margin: 6px auto;
+    color: #6B7280;
+    background: #fff;
+    border: 1px solid transparent;
+    transition: all 0.2s ease-out;
+  }
+
+  .mini-rail button:hover {
+    background: #FFF1F7;
+    border-color: #F7B4D1;
+    color: #CE5997;
+  }
+
+  .mini-rail button[aria-current="page"] {
+    background: linear-gradient(180deg, #FFD6EB 0%, #FFEAF4 100%);
+    border-color: #F5A3C5;
+    color: #D8218C;
+    box-shadow: 0 4px 12px rgba(216, 33, 140, 0.22);
+  }
+
+  .mini-rail svg {
+    width: 20px;
+    height: 20px;
+    stroke-width: 2;
+    color: inherit;
+  }
+  
+  .shasha {
+    background: #fff;
+    border-radius: 12px;
+    border: solid 1px #e7e7e7;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    padding: 20px;
+    margin: 20px 0;
+  }
+
+  /* Page container for consistent max-width */
+  .page-container {
+    width: min(100% - 32px, var(--page-max-w));
+    margin-inline: auto;
+  }
+
+  /* Mobile-first responsive design */
+  @media (max-width: 1023px) {
+    .mini-rail {
+      display: none;
+    }
+  }
+}
